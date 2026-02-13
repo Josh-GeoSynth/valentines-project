@@ -7,6 +7,9 @@ export default function Home() {
   const [envelopeOpen, setEnvelopeOpen] = useState(false);
   const audioRef = useRef(null);
 
+  // Detect if user is on mobile
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 600;
+
   // Music autoplay on first user interaction
   useEffect(() => {
     const playMusic = () => {
@@ -22,12 +25,12 @@ export default function Home() {
   // Generate multiple hearts for animation
   const [hearts, setHearts] = useState([]);
   useEffect(() => {
-    const heartCount = 20; // number of hearts
+    const heartCount = 20;
     const newHearts = Array.from({ length: heartCount }, (_, i) => ({
       id: i,
-      left: Math.random() * 100, // percent
-      duration: 5 + Math.random() * 5, // seconds
-      size: 16 + Math.random() * 20, // px
+      left: Math.random() * 100,
+      duration: 5 + Math.random() * 5,
+      size: 16 + Math.random() * 20,
     }));
     setHearts(newHearts);
   }, []);
@@ -41,6 +44,17 @@ export default function Home() {
     if (e.target.id === "puzzleSlot") {
       e.target.appendChild(document.getElementById(data));
       setPuzzleDone(true);
+    }
+  };
+
+  const handlePuzzleClick = () => {
+    if (isMobile) {
+      const slot = document.getElementById("puzzleSlot");
+      const piece = document.getElementById("piece");
+      if (slot && piece) {
+        slot.appendChild(piece);
+        setPuzzleDone(true);
+      }
     }
   };
 
@@ -68,7 +82,7 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Steps: Step 1 */}
+      {/* Step 1 */}
       {step === 1 && (
         <section className={styles.section}>
           <h1>To the moon and back</h1>
@@ -86,8 +100,9 @@ export default function Home() {
             <img
               id="piece"
               src="/couple.jpg"
-              draggable="true"
+              draggable={!isMobile}
               onDragStart={drag}
+              onClick={handlePuzzleClick} // tap on mobile
               className={styles.puzzlePiece}
               alt="Puzzle Piece"
             />
@@ -140,6 +155,7 @@ export default function Home() {
             />
           </div>
 
+          {/* Card content */}
           {envelopeOpen && (
             <div className={styles.card}>
               <p>To the love of my life Mi Alma ❤️</p>
@@ -150,6 +166,32 @@ export default function Home() {
               </p>
             </div>
           )}
+
+          {/* Watch Video button - always visible after Step 4 */}
+          <button className={styles.button} onClick={() => setStep(5)}>
+            Watch Our Video 🎥
+          </button>
+        </section>
+      )}
+
+      {/* Step 5: Video */}
+      {step === 5 && (
+        <section className={styles.section}>
+          <h2>🎬 A Special Video for You</h2>
+          <video
+            className={styles.video}
+            controls
+            autoPlay
+            muted
+            loop
+            playsInline
+            src="/valentine.mp4"
+          >
+            Your browser does not support the video tag.
+          </video>
+          <button className={styles.button} onClick={() => setStep(1)}>
+            Watch Again 🔁
+          </button>
         </section>
       )}
     </div>
