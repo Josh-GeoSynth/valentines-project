@@ -91,16 +91,32 @@
 }
 
 /* Floating Hearts */
-.hearts::before,
-.hearts::after {
-  content: "❤️ ❤️ ❤️ ❤️ ❤️ ❤️ ❤️";
+.hearts {
   position: fixed;
-  top: -50px;
+  top: 0;
   left: 0;
   width: 100%;
-  font-size: 24px;
-  animation: fall 10s linear infinite;
+  height: 100%;
   pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+.heart {
+  position: absolute;
+  top: -50px;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* Video */
+.video {
+  width: 100%;       /* full width on small screens */
+  max-width: 500px;  /* caps the video size */
+  margin: 20px auto; /* centers horizontally with spacing */
+  display: block;    /* ensures centering */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* Animations */
@@ -109,8 +125,14 @@
   to { opacity: 1; }
 }
 @keyframes fall {
-  0% { transform: translateY(-50px); }
-  100% { transform: translateY(110vh); }
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
 }
 
 /* Mobile */
@@ -118,4 +140,5 @@
   .puzzlePiece { width: 150px; }
   .puzzleSlot { width: 160px; height: 160px; }
   .card { max-width: 90%; font-size: 14px; }
+  .video { max-width: 80%; }
 }
