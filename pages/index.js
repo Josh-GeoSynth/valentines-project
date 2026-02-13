@@ -1,61 +1,87 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "../styles/Home.module.css";
 
 export default function Home() {
   const [step, setStep] = useState(1);
   const [puzzleDone, setPuzzleDone] = useState(false);
   const [envelopeOpen, setEnvelopeOpen] = useState(false);
+  const audioRef = useRef(null);
 
-  // Autoplay music
+  // Music autoplay on first user interaction
   useEffect(() => {
-    const audio = document.getElementById("bgMusic");
-    if (audio) {
-      audio.volume = 0.5;
-      audio.play().catch(() => {});
-    }
+    const playMusic = () => {
+      if (audioRef.current) {
+        audioRef.current.volume = 0.5;
+        audioRef.current.play().catch(() => {});
+      }
+      window.removeEventListener("click", playMusic);
+    };
+    window.addEventListener("click", playMusic);
   }, []);
 
-  // Puzzle logic
-  function allowDrop(e) {
-    e.preventDefault();
-  }
+  // Generate multiple hearts for animation
+  const [hearts, setHearts] = useState([]);
+  useEffect(() => {
+    const heartCount = 20; // number of hearts
+    const newHearts = Array.from({ length: heartCount }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100, // percent
+      duration: 5 + Math.random() * 5, // seconds
+      size: 16 + Math.random() * 20, // px
+    }));
+    setHearts(newHearts);
+  }, []);
 
-  function drag(e) {
-    e.dataTransfer.setData("text", e.target.id);
-  }
-
-  function drop(e) {
+  // Puzzle functions
+  const allowDrop = (e) => e.preventDefault();
+  const drag = (e) => e.dataTransfer.setData("text", e.target.id);
+  const drop = (e) => {
     e.preventDefault();
     const data = e.dataTransfer.getData("text");
     if (e.target.id === "puzzleSlot") {
       e.target.appendChild(document.getElementById(data));
       setPuzzleDone(true);
     }
-  }
+  };
 
   return (
     <div className={styles.container}>
       {/* Background Music */}
-      <audio id="bgMusic" loop>
-        <source src="/music.mp3" type="audio/mpeg" />
+      <audio ref={audioRef} loop>
+        <source src="/Mi Alma.mp3" type="audio/mpeg" />
       </audio>
 
-      {/* Floating Hearts */}
-      <div className={styles.hearts}></div>
+      {/* Animated Hearts */}
+      <div className={styles.hearts}>
+        {hearts.map((heart) => (
+          <span
+            key={heart.id}
+            className={styles.heart}
+            style={{
+              left: `${heart.left}%`,
+              animationDuration: `${heart.duration}s`,
+              fontSize: `${heart.size}px`,
+            }}
+          >
+            ❤️
+          </span>
+        ))}
+      </div>
 
+      {/* Steps: Step 1 */}
       {step === 1 && (
         <section className={styles.section}>
-          <h1>Apparently tech bros are stepping up this year</h1>
+          <h1>To the moon and back</h1>
           <button className={styles.button} onClick={() => setStep(2)}>
             Continue ❤️
           </button>
         </section>
       )}
 
+      {/* Step 2: Puzzle */}
       {step === 2 && (
         <section className={styles.section}>
           <h2>🧩 Piece Us Together</h2>
-
           <div className={styles.puzzleArea}>
             <img
               id="piece"
@@ -63,8 +89,8 @@ export default function Home() {
               draggable="true"
               onDragStart={drag}
               className={styles.puzzlePiece}
+              alt="Puzzle Piece"
             />
-
             <div
               id="puzzleSlot"
               className={styles.puzzleSlot}
@@ -83,37 +109,44 @@ export default function Home() {
         </section>
       )}
 
+      {/* Step 3: Quote */}
       {step === 3 && (
         <section className={styles.section}>
           <p className={styles.quote}>
             “we’re doing long distance, he probs didn’t get me anything”
           </p>
-
           <button className={styles.button} onClick={() => setStep(4)}>
             Wait…
           </button>
         </section>
       )}
 
+      {/* Step 4: Envelope */}
       {step === 4 && (
         <section className={styles.section}>
           <h2>💌 Tap Envelope</h2>
-
-          <img
-            src="/envelope.png"
+          <div
             className={
-              envelopeOpen ? styles.envelopeOpen : styles.envelopeClosed
+              envelopeOpen
+                ? styles.envelopeWrapperOpen
+                : styles.envelopeWrapperClosed
             }
             onClick={() => setEnvelopeOpen(true)}
-          />
+          >
+            <img
+              src="/envelope.png"
+              className={styles.envelope}
+              alt="Envelope"
+            />
+          </div>
 
           {envelopeOpen && (
             <div className={styles.card}>
-              <p>To the love of my life ❤️</p>
+              <p>To the love of my life Mi Alma ❤️</p>
               <p>
                 I will always love you no matter what.  
                 You are the best part of my life.  
-                I can’t imagine life without you.
+                I can’t imagine life without you. FOREVER IS THE DEAL.
               </p>
             </div>
           )}
