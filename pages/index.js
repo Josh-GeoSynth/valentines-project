@@ -1,27 +1,85 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../styles/Home.module.css";
 
 export default function Home() {
   const [step, setStep] = useState(1);
+  const [puzzleDone, setPuzzleDone] = useState(false);
+  const [envelopeOpen, setEnvelopeOpen] = useState(false);
+
+  // Autoplay music
+  useEffect(() => {
+    const audio = document.getElementById("bgMusic");
+    if (audio) {
+      audio.volume = 0.5;
+      audio.play().catch(() => {});
+    }
+  }, []);
+
+  // Puzzle logic
+  function allowDrop(e) {
+    e.preventDefault();
+  }
+
+  function drag(e) {
+    e.dataTransfer.setData("text", e.target.id);
+  }
+
+  function drop(e) {
+    e.preventDefault();
+    const data = e.dataTransfer.getData("text");
+    if (e.target.id === "puzzleSlot") {
+      e.target.appendChild(document.getElementById(data));
+      setPuzzleDone(true);
+    }
+  }
 
   return (
     <div className={styles.container}>
+      {/* Background Music */}
+      <audio id="bgMusic" loop>
+        <source src="/music.mp3" type="audio/mpeg" />
+      </audio>
+
+      {/* Floating Hearts */}
+      <div className={styles.hearts}></div>
+
       {step === 1 && (
-        <section className={styles.hero}>
+        <section className={styles.section}>
           <h1>Apparently tech bros are stepping up this year</h1>
           <button className={styles.button} onClick={() => setStep(2)}>
-            Continue
+            Continue ❤️
           </button>
         </section>
       )}
 
       {step === 2 && (
         <section className={styles.section}>
-          <h2>Piece Us Together</h2>
-          <p>Love is built piece by piece ❤️</p>
-          <button className={styles.button} onClick={() => setStep(3)}>
-            Puzzle Completed ❤️
-          </button>
+          <h2>🧩 Piece Us Together</h2>
+
+          <div className={styles.puzzleArea}>
+            <img
+              id="piece"
+              src="/couple.jpg"
+              draggable="true"
+              onDragStart={drag}
+              className={styles.puzzlePiece}
+            />
+
+            <div
+              id="puzzleSlot"
+              className={styles.puzzleSlot}
+              onDrop={drop}
+              onDragOver={allowDrop}
+            >
+              Drop Here ❤️
+            </div>
+          </div>
+
+          {puzzleDone && (
+            <button className={styles.button} onClick={() => setStep(3)}>
+              Continue 💖
+            </button>
+          )}
         </section>
       )}
 
@@ -30,6 +88,7 @@ export default function Home() {
           <p className={styles.quote}>
             “we’re doing long distance, he probs didn’t get me anything”
           </p>
+
           <button className={styles.button} onClick={() => setStep(4)}>
             Wait…
           </button>
@@ -38,25 +97,26 @@ export default function Home() {
 
       {step === 4 && (
         <section className={styles.section}>
-          <h2>❤️ Heart 2 Heart ❤️</h2>
+          <h2>💌 Tap Envelope</h2>
 
-          <div className={styles.card}>
-            <p>To the love of my life,</p>
-            <p>
-              You make my life meaningful and I am so lucky to have you as my
-              valentine.
-            </p>
-            <p>
-              I love you wholeheartedly and can’t wait to keep loving you for the
-              rest of my life.
-            </p>
-          </div>
+          <img
+            src="/envelope.png"
+            className={
+              envelopeOpen ? styles.envelopeOpen : styles.envelopeClosed
+            }
+            onClick={() => setEnvelopeOpen(true)}
+          />
 
-          <div className={styles.notes}>
-            <span>I will always love you no matter what</span>
-            <span>You are the best part of my life</span>
-            <span>I can’t imagine life without you</span>
-          </div>
+          {envelopeOpen && (
+            <div className={styles.card}>
+              <p>To the love of my life ❤️</p>
+              <p>
+                I will always love you no matter what.  
+                You are the best part of my life.  
+                I can’t imagine life without you.
+              </p>
+            </div>
+          )}
         </section>
       )}
     </div>
