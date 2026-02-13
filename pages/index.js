@@ -9,7 +9,7 @@ export default function Home() {
       {step === 1 && (
         <section className={styles.hero}>
           <h1>Apparently tech bros are stepping up this year</h1>
-          <button onClick={() => setStep(2)}>Continue</button>
+          <button className={styles.button} onClick={() => setStep(2)}>Continue</button>
         </section>
       )}
 
